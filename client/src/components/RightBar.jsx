@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TrendingUp, Users, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 export const RightBar = () => {
     const [analytics, setAnalytics] = useState(null);
@@ -10,7 +11,7 @@ export const RightBar = () => {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await axios.get('http://localhost:3001/api/posts/analytics/trending');
+                const res = await axios.get(`${config.apiUrl}/api/posts/analytics/trending`);
                 setAnalytics(res.data);
             } catch (e) {
                 console.error(e);

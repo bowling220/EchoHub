@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Heart, MessageSquare, Share2, UserPlus, Zap, Activity, AlertTriangle, Trash2, X, CheckCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 const Notifications = () => {
     const { user } = useAuth();
@@ -16,7 +17,7 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await axios.get(`http://localhost:3001/api/notifications?userId=${user.id}`);
+            const res = await axios.get(`${config.apiUrl}/api/notifications?userId=${user.id}`);
             setNotifications(res.data);
         } catch (e) {
             console.error(e);
@@ -27,7 +28,7 @@ const Notifications = () => {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post('http://localhost:3001/api/notifications/mark-read', { userId: user.id });
+            await axios.post(`${config.apiUrl}/api/notifications/mark-read`, { userId: user.id });
             setNotifications(prev => prev.map(n => ({ ...n, isRead: 1 })));
         } catch (e) {
             console.error(e);
@@ -36,7 +37,7 @@ const Notifications = () => {
 
     const deleteNotification = async (notifId) => {
         try {
-            await axios.delete(`http://localhost:3001/api/notifications/${notifId}?userId=${user.id}`);
+            await axios.delete(`${config.apiUrl}/api/notifications/${notifId}?userId=${user.id}`);
             setNotifications(prev => prev.filter(n => n.id !== notifId));
         } catch (e) {
             console.error(e);

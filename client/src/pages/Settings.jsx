@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { User, Image as ImageIcon, Palette, Save, CheckCircle } from 'lucide-react';
+import config from '../config';
 
 const Settings = () => {
     const { user, login } = useAuth(); // We'll use login to 'refresh' the user object in context
@@ -24,7 +25,7 @@ const Settings = () => {
     const handleSave = async () => {
         setSaving(true);
         try {
-            const res = await axios.patch('http://localhost:3001/api/users/profile', {
+            const res = await axios.patch(`${config.apiUrl}/api/users/profile`, {
                 userId: user.id,
                 bio,
                 avatar: avatar.trim(),

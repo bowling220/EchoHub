@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/PostCard';
 import { ArrowLeft, Loader } from 'lucide-react';
+import config from '../config';
 
 const PostDetail = () => {
     const { postId } = useParams();
@@ -20,7 +21,7 @@ const PostDetail = () => {
     const fetchPost = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:3001/api/posts/${postId}?currentUserId=${user?.id || 0}`);
+            const res = await axios.get(`${config.apiUrl}/api/posts/${postId}?currentUserId=${user?.id || 0}`);
             setPost(res.data);
         } catch (e) {
             console.error(e);

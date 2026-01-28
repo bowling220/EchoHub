@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/PostCard';
+import config from '../config';
 
 const Composer = ({ onPost }) => {
     const [content, setContent] = useState('');
@@ -10,7 +11,7 @@ const Composer = ({ onPost }) => {
     const handleSubmit = async () => {
         if (!content.trim()) return;
         try {
-            await axios.post('http://localhost:3001/api/posts', { content, userId: user.id });
+            await axios.post(`${config.apiUrl}/api/posts`, { content, userId: user.id });
             setContent('');
             if (onPost) onPost();
         } catch (e) {
@@ -58,12 +59,12 @@ export const Feed = ({ socket, onViewTree, mode = 'explore' }) => {
         setLoading(true);
         try {
             const isFollowing = mode === 'home';
-            const res = await axios.get(`http://localhost:3001/api/posts?currentUserId=${user.id}&following=${isFollowing}`);
+            const res = await axios.get(`${config.apiUrl}/api/posts?currentUserId=${user.id}&following=${isFollowing}`);
             setPosts(res.data);
 
             // Check if user has any follows
             if (mode === 'home') {
-                const followRes = await axios.get(`http://localhost:3001/api/users/${user.username}?currentUserId=${user.id}`);
+                const followRes = await axios.get(`${config.apiUrl}/api/users/${user.username}?currentUserId=${user.id}`);
                 setHasFollows(followRes.data.following > 0);
             }
         } catch (e) {

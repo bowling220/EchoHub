@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Users, MessageSquare, Database, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 const Admin = () => {
     const { user } = useAuth();
@@ -19,10 +20,10 @@ const Admin = () => {
 
         const fetchAdminData = async () => {
             try {
-                const usersRes = await axios.get('http://localhost:3001/api/users/system/active');
+                const usersRes = await axios.get(`${config.apiUrl}/api/users/system/active`);
                 setAllUsers(usersRes.data);
 
-                const statsRes = await axios.get('http://localhost:3001/api/users/system/stats');
+                const statsRes = await axios.get(`${config.apiUrl}/api/users/system/stats`);
                 setStats(statsRes.data);
 
                 setLoading(false);
@@ -43,7 +44,7 @@ const Admin = () => {
         }
 
         try {
-            await axios.post(`http://localhost:3001/api/users/system/suspend/${userId}`, {
+            await axios.post(`${config.apiUrl}/api/users/system/suspend/${userId}`, {
                 adminId: user.id,
                 reason
             });

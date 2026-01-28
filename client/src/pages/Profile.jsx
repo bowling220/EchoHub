@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/PostCard';
 import { Users, UserPlus, UserCheck, Calendar, X, CheckCircle, MessageSquare, Settings as SettingsIcon, Save, Camera } from 'lucide-react';
+import config from '../config';
 
 const EditProfileModal = ({ user, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
@@ -18,7 +19,7 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.patch('http://localhost:3001/api/users/profile', {
+            await axios.patch(`${config.apiUrl}/api/users/profile`, {
                 userId: user.id,
                 ...formData
             });
@@ -112,7 +113,7 @@ const UserListModal = ({ title, userId, type, onClose }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await axios.get(`http://localhost:3001/api/users/${userId}/${type}`);
+                const res = await axios.get(`${config.apiUrl}/api/users/${userId}/${type}`);
                 setUsers(res.data);
             } catch (e) {
                 console.error(e);
@@ -214,9 +215,9 @@ const Profile = ({ onViewTree }) => {
     const fetchProfile = async () => {
         setLoading(true);
         try {
-            const userRes = await axios.get(`http://localhost:3001/api/users/${username}?currentUserId=${currentUser?.id}`);
+            const userRes = await axios.get(`${config.apiUrl}/api/users/${username}?currentUserId=${currentUser?.id}`);
             setProfile(userRes.data);
-            const postsRes = await axios.get(`http://localhost:3001/api/posts?authorId=${userRes.data.id}&currentUserId=${currentUser?.id}`);
+            const postsRes = await axios.get(`${config.apiUrl}/api/posts?authorId=${userRes.data.id}&currentUserId=${currentUser?.id}`);
             setPosts(postsRes.data);
         } catch (e) {
             console.error(e);
@@ -227,7 +228,7 @@ const Profile = ({ onViewTree }) => {
 
     const handleFollow = async () => {
         try {
-            const res = await axios.post(`http://localhost:3001/api/users/${profile.id}/follow`, { currentUserId: currentUser.id });
+            const res = await axios.post(`${config.apiUrl}/api/users/${profile.id}/follow`, { currentUserId: currentUser.id });
             setProfile(prev => ({
                 ...prev,
                 isFollowing: res.data.following,
