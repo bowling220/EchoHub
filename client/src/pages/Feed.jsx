@@ -41,7 +41,7 @@ export const Feed = ({ socket, onViewTree, mode = 'explore' }) => {
     const { user } = useAuth();
 
     useEffect(() => {
-        if (user) fetchPosts();
+        fetchPosts();
 
         // For live updates: only add to feed if it matches user's view (for now we simplify: always show)
         socket.on('new_post', (post) => {
@@ -58,12 +58,13 @@ export const Feed = ({ socket, onViewTree, mode = 'explore' }) => {
     const fetchPosts = async () => {
         setLoading(true);
         try {
-            const isFollowing = mode === 'home';
-            const res = await axios.get(`${config.apiUrl}/api/posts?currentUserId=${user.id}&following=${isFollowing}`);
+            const isFollowing = mode === 'home' && user;
+            const userId = user?.id || 0;
+            const res = await axios.get(`${config.apiUrl}/api/posts?currentUserId=${userId}&following=${isFollowing}`);
             setPosts(res.data);
 
             // Check if user has any follows
-            if (mode === 'home') {
+            if (mode === 'home' && user) {
                 const followRes = await axios.get(`${config.apiUrl}/api/users/${user.username}?currentUserId=${user.id}`);
                 setHasFollows(followRes.data.following > 0);
             }
@@ -78,7 +79,7 @@ export const Feed = ({ socket, onViewTree, mode = 'explore' }) => {
 
     return (
         <div className="feed-container">
-            {mode === 'home' && <Composer onPost={fetchPosts} />}
+            {mode === 'home' && user && <Composer onPost={fetchPosts} />}
 
             {mode === 'home' && !hasFollows && posts.length > 0 && (
                 <div className="glass mono" style={{

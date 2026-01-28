@@ -417,10 +417,11 @@ const LoadingScreen = () => (
   </div>
 );
 
-const AuthScreen = ({ login, register }) => {
+const AuthScreen = ({ login, register, inline = false }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -432,6 +433,54 @@ const AuthScreen = ({ login, register }) => {
     }
   };
 
+  // Inline mode - compact buttons for guests
+  if (inline) {
+    if (!showForm) {
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => { setIsLogin(true); setShowForm(true); }}
+            style={{ padding: '0.7rem 1.5rem', fontSize: '0.9rem' }}
+          >
+            Login
+          </button>
+          <button
+            className="btn"
+            onClick={() => { setIsLogin(false); setShowForm(true); }}
+            style={{ padding: '0.7rem 1.5rem', fontSize: '0.9rem' }}
+          >
+            Sign Up
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="glass" style={{ padding: '2rem', borderRadius: '16px', minWidth: '300px' }}>
+        <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--accent)', fontSize: '1.2rem' }}>
+          {isLogin ? 'Login' : 'Sign Up'}
+        </h3>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn btn-primary" style={{ flex: 1 }}>
+              {isLogin ? 'Login' : 'Register'}
+            </button>
+            <button type="button" className="btn" onClick={() => setShowForm(false)}>
+              Cancel
+            </button>
+          </div>
+        </form>
+        <p style={{ textAlign: 'center', marginTop: '1rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--accent)' }} onClick={() => setIsLogin(!isLogin)}>
+          {isLogin ? 'Need an account?' : 'Have an account?'}
+        </p>
+      </div>
+    );
+  }
+
+  // Full-screen mode
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)' }}>
       <div className="glass" style={{ padding: '3.5rem', width: '400px', borderRadius: '24px', textAlign: 'center' }}>
@@ -517,13 +566,19 @@ export default function App() {
   }, [user]);
 
   if (loading) return <LoadingScreen />;
-  if (!user) return <AuthScreen login={login} register={register} />;
 
+  const location = useLocation();
   const isMessagesPage = location.pathname === '/messages';
+  const isAuthRequiredPage = ['/messages', '/notifications', '/settings', '/admin'].includes(location.pathname);
+
+  // Redirect to home if trying to access auth-required pages without login
+  if (!user && isAuthRequiredPage) {
+    return <AuthScreen login={login} register={register} />;
+  }
 
   return (
     <div className={`app-layout ${isStressed ? 'glitch-active' : ''}`} style={{
-      gridTemplateColumns: isMessagesPage ? '280px 1fr' : '280px 1fr 340px',
+      gridTemplateColumns: isMessagesPage ? '280px 1fr' : (user ? '280px 1fr 340px' : '1fr 340px'),
       maxWidth: '1440px',
       margin: '0 auto',
       padding: '0 2rem',
@@ -534,7 +589,19 @@ export default function App() {
       {isStressed && <div className="stress-banner">[ !! ALARM !! :: NETWORK_STRESS_DETECTED :: CORE_INTEGRITY_THREATENED ]</div>}
       {viewingTree && <TreeModal rootId={viewingTree} onClose={() => setViewingTree(null)} />}
       {showPalette && <CommandPalette onClose={() => setShowPalette(false)} />}
-      <Sidebar />
+      {user && <Sidebar />}
+      {!user && (
+        <div style={{
+          position: 'fixed',
+          top: '2rem',
+          right: '2rem',
+          zIndex: 100,
+          display: 'flex',
+          gap: '1rem'
+        }}>
+          <AuthScreen login={login} register={register} inline={true} />
+        </div>
+      )}
       <div style={{ minWidth: 0 }}>
         <Routes>
           <Route path="/" element={<Feed socket={socket} onViewTree={setViewingTree} mode="home" />} />
