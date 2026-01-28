@@ -4,7 +4,7 @@ services:
     name: echohub-api
     runtime: node
     region: oregon
-    plan: free
+    plan: starter
     buildCommand: cd server && npm install
     startCommand: cd server && npm start
     envVars:
@@ -25,7 +25,7 @@ services:
   - type: web
     name: echohub-client
     runtime: static
-    plan: free
+    plan: starter
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
     envVars:
