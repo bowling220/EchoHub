@@ -12,8 +12,9 @@ import Admin from './pages/Admin';
 import Messages from './pages/Messages';
 import PostDetail from './pages/PostDetail';
 import { RightBar } from './components/RightBar';
+import config from './config';
 
-const socket = io('http://localhost:3001');
+const socket = io(config.socketUrl);
 
 // --- Layout Components ---
 
@@ -45,7 +46,7 @@ const Sidebar = () => {
 
     const fetchUnreadCount = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/api/notifications/unread-count?userId=${user.id}`);
+        const res = await axios.get(`${config.apiUrl}/api/notifications/unread-count?userId=${user.id}`);
         setUnreadCount(res.data.count);
       } catch (e) {
         console.error(e);
@@ -198,7 +199,7 @@ const CommandPalette = ({ onClose }) => {
     }
     const timer = setTimeout(async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/api/users/system/search?q=${query}`);
+        const res = await axios.get(`${config.apiUrl}/api/users/system/search?q=${query}`);
         setResults(res.data);
       } catch (err) { console.error(err); }
     }, 200);
@@ -347,7 +348,7 @@ const TreeModal = ({ rootId, onClose }) => {
   useEffect(() => {
     if (!rootId) return;
     setLoading(true);
-    axios.get(`http://localhost:3001/api/posts/tree/${rootId}`)
+    axios.get(`${config.apiUrl}/api/posts/tree/${rootId}`)
       .then(res => {
         setNodes(res.data);
         setLoading(false);

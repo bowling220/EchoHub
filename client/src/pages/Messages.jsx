@@ -5,8 +5,9 @@ import { io } from 'socket.io-client';
 import { Send, User, Search, MessageSquare, Shield, Cpu, Activity, Lock, Terminal, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { encrypt, decrypt } from '../services/cryptoService';
+import config from '../config';
 
-const socket = io('http://localhost:3001');
+const socket = io(config.socketUrl);
 
 const Messages = () => {
     const { user } = useAuth();
@@ -28,7 +29,7 @@ const Messages = () => {
 
         const fetchConversations = async () => {
             try {
-                const res = await axios.get(`http://localhost:3001/api/messages/conversations/${user.id}`);
+                const res = await axios.get(`${config.apiUrl}/api/messages/conversations/${user.id}`);
                 let convs = res.data;
 
                 if (location.state?.recipient) {
@@ -68,7 +69,7 @@ const Messages = () => {
         if (activeChat) {
             const fetchMessages = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:3001/api/messages/${user.id}/${activeChat.id}`);
+                    const res = await axios.get(`${config.apiUrl}/api/messages/${user.id}/${activeChat.id}`);
                     const privateKey = localStorage.getItem(`priv_${user.id}`);
 
                     const processed = await Promise.all(res.data.map(async (msg) => {
@@ -102,7 +103,7 @@ const Messages = () => {
         }
 
         try {
-            await axios.post('http://localhost:3001/api/messages', {
+            await axios.post(`${config.apiUrl}/api/messages`, {
                 senderId: user.id,
                 receiverId: activeChat.id,
                 content: contentToSend

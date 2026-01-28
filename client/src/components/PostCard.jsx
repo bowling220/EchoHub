@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSession } from '../context/SessionContext';
 import { Heart, MessageSquare, Activity, MoreHorizontal, Trash2, Edit3, X, Check, CheckCircle, Target } from 'lucide-react';
+import config from '../config';
 
 const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEditing = false, postId = null, contextBinding = null }) => {
     const { user } = useAuth();
@@ -31,9 +32,9 @@ const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEd
         setSending(true);
         try {
             if (isEditing) {
-                await axios.patch(`http://localhost:3001/api/posts/${postId}`, { content, userId: user.id });
+                await axios.patch(`${config.apiUrl}/api/posts/${postId}`, { content, userId: user.id });
             } else {
-                await axios.post('http://localhost:3001/api/posts', { content, userId: user.id, parentId, contextBinding });
+                await axios.post(`${config.apiUrl}/api/posts`, { content, userId: user.id, parentId, contextBinding });
                 localStorage.removeItem(draftKey);
                 trackContribution();
             }
@@ -114,7 +115,7 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
         try {
             setLiked(!liked);
             setCount(prev => liked ? prev - 1 : prev + 1);
-            const res = await axios.post(`http://localhost:3001/api/posts/${post.id}/like`, { userId: user.id });
+            const res = await axios.post(`${config.apiUrl}/api/posts/${post.id}/like`, { userId: user.id });
             setCount(res.data.count);
             setLiked(res.data.liked);
         } catch (e) {
@@ -136,7 +137,7 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
         }
 
         try {
-            await axios.delete(`http://localhost:3001/api/posts/${post.id}`, {
+            await axios.delete(`${config.apiUrl}/api/posts/${post.id}`, {
                 params: { userId: user.id },
                 data: { reason }
             });
@@ -153,7 +154,7 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
 
     const fetchReplies = async () => {
         try {
-            const res = await axios.get(`http://localhost:3001/api/posts?parentId=${post.id}&currentUserId=${user?.id}`);
+            const res = await axios.get(`${config.apiUrl}/api/posts?parentId=${post.id}&currentUserId=${user?.id}`);
             setReplies(res.data);
         } catch (e) {
             console.error(e);

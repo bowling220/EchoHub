@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { generateKeyPair } from '../services/cryptoService';
+import config from '../config';
 
 const AuthContext = createContext();
 
@@ -53,7 +54,7 @@ export const AuthProvider = ({ children }) => {
             const { publicKey, privateKey } = await generateKeyPair();
             localStorage.setItem(`priv_${currentUser.id}`, privateKey);
             // Update server with public key
-            await axios.patch('http://localhost:3001/api/users/profile', {
+            await axios.patch(`${config.apiUrl}/api/users/profile`, {
                 userId: currentUser.id,
                 publicKey: publicKey
             });
@@ -64,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const res = await axios.post('http://localhost:3001/api/auth/login', { username, password });
+            const res = await axios.post(`${config.apiUrl}/api/auth/login`, { username, password });
             let { token, user } = res.data;
             user = await initializeKeys(user);
             localStorage.setItem('token', token);
@@ -79,7 +80,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (username, password) => {
         try {
-            const res = await axios.post('http://localhost:3001/api/auth/register', { username, password });
+            const res = await axios.post(`${config.apiUrl}/api/auth/register`, { username, password });
             let { token, user } = res.data;
             user = await initializeKeys(user);
             localStorage.setItem('token', token);

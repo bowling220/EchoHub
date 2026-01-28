@@ -7,16 +7,36 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
+
+// Environment configuration
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Validate JWT secret in production
+if (NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.error('FATAL ERROR: JWT_SECRET is not defined.');
+    process.exit(1);
+}
+
 const io = new Server(server, {
     cors: {
-        origin: '*', // Allow all for dev
-        methods: ['GET', 'POST']
+        origin: NODE_ENV === 'production' ? CLIENT_URL : '*',
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: NODE_ENV === 'production' ? CLIENT_URL : '*',
+    credentials: true
+}));
 app.use(express.json());
+
+// Health check endpoint for Render
+app.get('/api/auth/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Routes
 const authRoutes = require('./routes/auth');
