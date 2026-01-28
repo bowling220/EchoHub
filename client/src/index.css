@@ -1,0 +1,374 @@
+:root {
+  --bg-primary: #050508;
+  --bg-secondary: #0a0a0f;
+  --bg-tertiary: #0f0f16;
+  --bg-glass: rgba(10, 10, 15, 0.75);
+  --text-primary: #ffffff;
+  --text-secondary: #8a8a9a;
+  --accent: #00f0ff;
+  --accent-glow: 0 0 20px rgba(0, 240, 255, 0.3);
+  --border: rgba(255, 255, 255, 0.08);
+  --font-main: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(circle at 50% -10%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(100, 0, 255, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* CYBER-FRAME BUTTON SYSTEM */
+.btn,
+.btn-primary {
+  background: #000 !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.btn:hover,
+.btn-primary:hover {
+  background: var(--accent) !important;
+  color: #000 !important;
+  box-shadow: 0 0 30px var(--accent);
+  transform: translateY(-2px);
+}
+
+/* Force icons to flip to black on hover */
+.btn:hover svg,
+.btn-primary:hover svg {
+  stroke: #000 !important;
+  color: #000 !important;
+}
+
+/* Layout */
+.app-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  gap: 3.5rem;
+  padding: 0 2rem;
+}
+
+.sidebar,
+.sidebar-right {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar,
+.sidebar-right::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-container {
+  padding: 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Cyber Elements */
+.cyber-grid {
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.scanline {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.05), transparent);
+  animation: scan 6s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes scan {
+  from {
+    top: -100px;
+  }
+
+  to {
+    top: 100%;
+  }
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--accent);
+}
+
+/* Post Cards */
+.post-card {
+  padding: 1.8rem;
+  border-radius: var(--radius);
+  background: rgba(15, 15, 22, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  background: rgba(20, 20, 30, 0.6);
+  border-color: rgba(0, 240, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Form Elements */
+input,
+textarea {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes access {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(-2px, -2px);
+  }
+
+  60% {
+    transform: translate(2px, 2px);
+  }
+
+  80% {
+    transform: translate(2px, -2px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+.glitch-active {
+  animation: glitch 0.2s infinite;
+  text-shadow: 2px 0 red, -2px 0 blue;
+  filter: hue-rotate(90deg);
+}
+
+.stress-banner {
+  background: #ff4d4d;
+  color: black;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 2px 10px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  letter-spacing: 4px;
+  font-weight: bold;
+}
+
+.loader {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+  overflow: hidden;
+}
+
+.loader::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  animation: access 2s infinite linear;
+}
+
+.cmd-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.cmd-item:hover {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent);
+  padding-left: 1.5rem;
+}
+
+/* Transmission States */
+.post-locked {
+  border-left: 4px solid #ff4d4d !important;
+  opacity: 0.8;
+}
+
+.post-archived {
+  filter: grayscale(0.8) opacity(0.6);
+}
+
+.post-fading {
+  mask-image: linear-gradient(to right, black, transparent);
+  -webkit-mask-image: linear-gradient(to right, black, transparent);
+}
+
+@keyframes ambientPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 240, 255, 0.1);
+    border-color: rgba(0, 240, 255, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    border-color: rgba(0, 240, 255, 0.4);
+  }
+
+  100% {
+    box-shadow: 0 0 5px rgba(0, 240, 255, 0.1);
+    border-color: rgba(0, 240, 255, 0.1);
+  }
+}
+
+.ambient-pulse {
+  animation: ambientPulse 4s infinite ease-in-out;
+}
+
+.bound-highlight {
+  background: rgba(0, 240, 255, 0.15);
+  border-bottom: 1px solid var(--accent);
+  padding: 0 2px;
+  cursor: help;
+  transition: all 0.3s ease;
+}
+
+.bound-highlight:hover {
+  background: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.notif-unread {
+  background: rgba(0, 240, 255, 0.05);
+}
