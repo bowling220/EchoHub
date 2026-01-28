@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSession } from '../context/SessionContext';
 import { Heart, MessageSquare, Activity, MoreHorizontal, Trash2, Edit3, X, Check, CheckCircle, Target } from 'lucide-react';
 import config from '../config';
+import { LoginModal } from '../App';
 
 const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEditing = false, postId = null, contextBinding = null }) => {
     const { user } = useAuth();
@@ -102,6 +103,7 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
     const [replies, setReplies] = useState([]);
     const [isExpanded, setIsExpanded] = useState(depth < 2); // Auto-collapse deep threads
     const [boundText, setBoundText] = useState(null);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const menuRef = useRef(null);
 
     // Heuristic: Signal increases with conversation depth and activity, noise with brevity
@@ -112,6 +114,13 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
 
     const handleLike = async (e) => {
         e.stopPropagation();
+
+        // Show login modal if not logged in
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+
         try {
             setLiked(!liked);
             setCount(prev => liked ? prev - 1 : prev + 1);
@@ -427,6 +436,13 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
                         ))
                     )}
                 </div>
+            )}
+
+            {showLoginModal && (
+                <LoginModal
+                    onClose={() => setShowLoginModal(false)}
+                    message="Sign in to like posts and interact with the community"
+                />
             )}
         </div>
     );

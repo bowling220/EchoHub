@@ -536,6 +536,136 @@ const AuthScreen = ({ login, register, inline = false }) => {
   );
 };
 
+// Login Modal for guest interactions
+export const LoginModal = ({ onClose, message = "Sign in to interact with posts" }) => {
+  const { login, register } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isLogin) await login(username, password);
+      else await register(username, password);
+      onClose();
+    } catch (e) {
+      alert('Error: ' + (e.response?.data?.error || e.message));
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="glass cyber-grid"
+        style={{
+          width: '100%',
+          maxWidth: '450px',
+          padding: '2.5rem',
+          borderRadius: '24px',
+          position: 'relative',
+          border: '1px solid var(--accent)',
+          background: 'rgba(10, 10, 15, 0.95)'
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="scanline" />
+
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            fontSize: '1.5rem'
+          }}
+        >
+          ×
+        </button>
+
+        <div className="mono glow-text" style={{
+          fontSize: '0.75rem',
+          color: 'var(--accent)',
+          marginBottom: '1rem',
+          letterSpacing: '3px',
+          textAlign: 'center'
+        }}>
+          🔒 AUTHENTICATION_REQUIRED
+        </div>
+
+        <h2 style={{
+          marginTop: 0,
+          marginBottom: '1rem',
+          color: 'var(--text-primary)',
+          fontSize: '1.5rem',
+          textAlign: 'center'
+        }}>
+          {isLogin ? 'Login to Continue' : 'Create Account'}
+        </h2>
+
+        <p style={{
+          color: 'var(--text-secondary)',
+          fontSize: '0.9rem',
+          marginBottom: '2rem',
+          textAlign: 'center',
+          lineHeight: '1.5'
+        }}>
+          {message}
+        </p>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <input
+            placeholder="Username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            autoFocus
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+          <button className="btn btn-primary" style={{ padding: '1rem', fontSize: '1rem' }}>
+            {isLogin ? 'LOGIN' : 'REGISTER'}
+          </button>
+        </form>
+
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: '1.5rem',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            color: 'var(--accent)'
+          }}
+          onClick={() => setIsLogin(!isLogin)}
+        >
+          {isLogin ? 'Need an account? Sign up' : 'Already have an account? Login'}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
 export default function App() {
   const { user, login, register, loading } = useAuth();
   const [viewingTree, setViewingTree] = useState(null);
