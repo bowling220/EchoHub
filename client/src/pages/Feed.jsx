@@ -79,7 +79,7 @@ export const Feed = ({ socket, onViewTree, mode = 'explore' }) => {
 
     return (
         <div className="feed-container">
-            {mode === 'home' && user && <Composer onPost={fetchPosts} />}
+            {mode === 'home' && <Composer onPost={fetchPosts} />}
 
             {mode === 'home' && !hasFollows && posts.length > 0 && (
                 <div className="glass mono" style={{

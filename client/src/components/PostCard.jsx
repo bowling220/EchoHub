@@ -10,24 +10,30 @@ import { LoginModal } from '../App';
 const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEditing = false, postId = null, contextBinding = null }) => {
     const { user } = useAuth();
     const { trackContribution } = useSession();
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const draftKey = `draft_${user?.id}_${parentId || 'root'}_${postId || ''}`;
 
     const [content, setContent] = useState(() => {
         if (isEditing) return initialContent;
+        if (!user) return '';
         return localStorage.getItem(draftKey) || initialContent;
     });
     const [sending, setSending] = useState(false);
     const [cooldown, setCooldown] = useState(false);
 
     useEffect(() => {
-        if (!isEditing && content) {
+        if (!isEditing && content && user) {
             localStorage.setItem(draftKey, content);
-        } else if (!content) {
+        } else if (!content && user) {
             localStorage.removeItem(draftKey);
         }
-    }, [content, draftKey, isEditing]);
+    }, [content, draftKey, isEditing, user]);
 
     const handleSubmit = async () => {
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
         if (!content.trim() || sending || cooldown) return;
 
         setSending(true);
@@ -53,33 +59,48 @@ const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEd
     };
 
     return (
-        <div className={parentId || isEditing ? "" : "glass"} style={{
-            padding: (parentId || isEditing) ? '1rem 0' : '1.5rem',
-            borderRadius: 'var(--radius)',
-            opacity: sending ? 0.7 : 1,
-            transition: 'opacity 0.3s ease'
-        }}>
+        <div
+            className={parentId || isEditing ? "" : "glass"}
+            style={{
+                padding: (parentId || isEditing) ? '1rem 0' : '1.5rem',
+                borderRadius: 'var(--radius)',
+                opacity: sending ? 0.7 : 1,
+                transition: 'opacity 0.3s ease',
+                cursor: !user ? 'pointer' : 'default'
+            }}
+            onClick={!user ? () => setShowLoginModal(true) : undefined}
+        >
+            {showLoginModal && (
+                <LoginModal
+                    onClose={() => setShowLoginModal(false)}
+                    message="Sign in to broadcast your signals to the EchoHub network"
+                />
+            )}
             <textarea
                 placeholder={isEditing ? "Editing..." : (parentId ? "Drafting response..." : "What's the frequency?")}
                 rows={parentId || isEditing ? 2 : 3}
                 value={content}
-                disabled={sending}
+                disabled={sending || !user}
                 onChange={(e) => setContent(e.target.value)}
                 style={{
                     transition: 'all 0.3s ease',
-                    filter: cooldown ? 'grayscale(0.5) blur(0.5px)' : 'none'
+                    filter: cooldown ? 'grayscale(0.5) blur(0.5px)' : 'none',
+                    cursor: !user ? 'pointer' : 'text'
                 }}
             />
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginTop: '1rem' }}>
                 {onCancel && <button className="btn" onClick={onCancel}>CANCEL</button>}
                 <button
                     className="btn-primary"
-                    onClick={handleSubmit}
-                    disabled={sending || cooldown || !content.trim()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleSubmit();
+                    }}
+                    disabled={sending || cooldown || (user && !content.trim())}
                     style={{
                         minWidth: '140px',
                         cursor: (sending || cooldown) ? 'wait' : 'pointer',
-                        filter: cooldown ? 'brightness(0.5)' : 'none',
+                        filter: (cooldown || (!user && false)) ? 'brightness(0.5)' : 'none',
                         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                 >
@@ -360,7 +381,13 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
 
                     <div
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                        onClick={() => setReplying(!replying)}
+                        onClick={() => {
+                            if (!user) {
+                                setShowLoginModal(true);
+                                return;
+                            }
+                            setReplying(!replying);
+                        }}
                     >
                         <MessageSquare size={18} />
                         <span style={{ fontSize: '0.85rem' }}>Reply</span>
@@ -369,6 +396,10 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
                     <div
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
                         onClick={() => {
+                            if (!user) {
+                                setShowLoginModal(true);
+                                return;
+                            }
                             onViewTree(post.originId || post.id);
                             trackLineage(post.id);
                         }}

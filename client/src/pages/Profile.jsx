@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/PostCard';
 import { Users, UserPlus, UserCheck, Calendar, X, CheckCircle, MessageSquare, Settings as SettingsIcon, Save, Camera } from 'lucide-react';
 import config from '../config';
+import { LoginModal } from '../App';
 
 const EditProfileModal = ({ user, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
@@ -207,6 +208,7 @@ const Profile = ({ onViewTree }) => {
     const [loading, setLoading] = useState(true);
     const [userList, setUserList] = useState(null); // { title: string, type: 'followers' | 'following' }
     const [isEditing, setIsEditing] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -227,6 +229,11 @@ const Profile = ({ onViewTree }) => {
     };
 
     const handleFollow = async () => {
+        if (!currentUser) {
+            setShowLoginModal(true);
+            return;
+        }
+
         try {
             const res = await axios.post(`${config.apiUrl}/api/users/${profile.id}/follow`, { currentUserId: currentUser.id });
             setProfile(prev => ({
@@ -346,7 +353,13 @@ const Profile = ({ onViewTree }) => {
                         {currentUser && currentUser.username !== profile.username && (
                             <div style={{ display: 'flex', gap: '10px' }}>
                                 <button
-                                    onClick={() => navigate('/messages', { state: { recipient: profile } })}
+                                    onClick={() => {
+                                        if (!currentUser) {
+                                            setShowLoginModal(true);
+                                            return;
+                                        }
+                                        navigate('/messages', { state: { recipient: profile } });
+                                    }}
                                     className="btn"
                                 >
                                     <MessageSquare size={18} /> MESSAGE
@@ -417,6 +430,13 @@ const Profile = ({ onViewTree }) => {
                     </div>
                 )}
             </div>
+
+            {showLoginModal && (
+                <LoginModal
+                    onClose={() => setShowLoginModal(false)}
+                    message="Sign in to interact with users and build your network"
+                />
+            )}
         </div>
     );
 };

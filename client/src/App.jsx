@@ -34,6 +34,8 @@ const Logo = ({ size = 40 }) => (
 const Sidebar = ({ login, register }) => {
   const { user, logout, presence } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate();
 
   const presenceColors = {
     'Active': '#00f0ff',
@@ -67,14 +69,24 @@ const Sidebar = ({ login, register }) => {
     borderRadius: '12px',
     color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
     background: isActive ? 'rgba(0, 240, 255, 0.1)' : 'transparent',
-    textDecoration: 'none',
-    fontWeight: isActive ? '600' : '400',
-    marginBottom: '0.5rem',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    width: '100%',
+    textAlign: 'left',
     border: '1px solid',
     borderColor: isActive ? 'var(--accent)' : 'transparent',
-    borderOpacity: 0.2
+    cursor: 'pointer',
+    textDecoration: 'none',
+    fontSize: '0.95rem',
+    fontWeight: isActive ? '600' : '400',
+    marginBottom: '0.5rem',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
   });
+
+  const handleProtectedClick = (e, path) => {
+    if (!user) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  };
 
   return (
     <div className="sidebar" style={{
@@ -90,7 +102,7 @@ const Sidebar = ({ login, register }) => {
       <nav style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <NavLink to="/" style={navStyle}><Home size={22} /> Home</NavLink>
         <NavLink to="/explore" style={navStyle}><Compass size={22} /> Explore</NavLink>
-        <NavLink to="/notifications" style={(props) => ({ ...navStyle(props), position: 'relative' })}>
+        <NavLink to="/notifications" onClick={(e) => handleProtectedClick(e, '/notifications')} style={(props) => ({ ...navStyle(props), position: 'relative' })}>
           <Bell size={22} />
           Transmissions
           {unreadCount > 0 && (
@@ -114,13 +126,20 @@ const Sidebar = ({ login, register }) => {
             </span>
           )}
         </NavLink>
-        <NavLink to="/messages" style={navStyle}><MessageSquare size={22} /> Neural Bridge</NavLink>
-        <NavLink to={`/profile/${user?.username}`} style={navStyle}><User size={22} /> Identity</NavLink>
-        <NavLink to="/settings" style={navStyle}><SettingsIcon size={22} /> Settings</NavLink>
+        <NavLink to="/messages" onClick={(e) => handleProtectedClick(e, '/messages')} style={navStyle}><MessageSquare size={22} /> Neural Bridge</NavLink>
+        <NavLink to={user ? `/profile/${user.username}` : '/login'} onClick={(e) => handleProtectedClick(e, `/profile/${user?.username}`)} style={navStyle}><User size={22} /> Identity</NavLink>
+        <NavLink to="/settings" onClick={(e) => handleProtectedClick(e, '/settings')} style={navStyle}><SettingsIcon size={22} /> Settings</NavLink>
         {user?.role === 'admin' && (
           <NavLink to="/admin" style={navStyle}><Activity size={22} /> Admin Panel</NavLink>
         )}
       </nav>
+
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          message="Sign in to access your personal hub and transmissions"
+        />
+      )}
 
       <div className="sidebar-footer" style={{ marginTop: 'auto' }}>
         {user ? (
