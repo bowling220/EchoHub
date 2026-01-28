@@ -8,9 +8,8 @@ import config from '../config';
 import { LoginModal } from '../App';
 
 const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEditing = false, postId = null, contextBinding = null }) => {
-    const { user } = useAuth();
+    const { user, setShowLoginModal } = useAuth();
     const { trackContribution } = useSession();
-    const [showLoginModal, setShowLoginModal] = useState(false);
     const draftKey = `draft_${user?.id}_${parentId || 'root'}_${postId || ''}`;
 
     const [content, setContent] = useState(() => {
@@ -70,12 +69,6 @@ const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEd
             }}
             onClick={!user ? () => setShowLoginModal(true) : undefined}
         >
-            {showLoginModal && (
-                <LoginModal
-                    onClose={() => setShowLoginModal(false)}
-                    message="Sign in to broadcast your signals to the EchoHub network"
-                />
-            )}
             <textarea
                 placeholder={isEditing ? "Editing..." : (parentId ? "Drafting response..." : "What's the frequency?")}
                 rows={parentId || isEditing ? 2 : 3}
@@ -112,7 +105,7 @@ const Composer = ({ onPost, parentId = null, onCancel, initialContent = '', isEd
 };
 
 export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
-    const { user } = useAuth();
+    const { user, setShowLoginModal } = useAuth();
     const { trackLineage, trackActiveTransmission } = useSession();
     const navigate = useNavigate();
     const [liked, setLiked] = useState(post.userLiked);
@@ -124,7 +117,6 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
     const [replies, setReplies] = useState([]);
     const [isExpanded, setIsExpanded] = useState(depth < 2); // Auto-collapse deep threads
     const [boundText, setBoundText] = useState(null);
-    const [showLoginModal, setShowLoginModal] = useState(false);
     const menuRef = useRef(null);
 
     // Heuristic: Signal increases with conversation depth and activity, noise with brevity
@@ -467,13 +459,6 @@ export const PostCard = ({ post, onViewTree, onDeleteSuccess, depth = 0 }) => {
                         ))
                     )}
                 </div>
-            )}
-
-            {showLoginModal && (
-                <LoginModal
-                    onClose={() => setShowLoginModal(false)}
-                    message="Sign in to like posts and interact with the community"
-                />
             )}
         </div>
     );

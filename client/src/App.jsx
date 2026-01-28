@@ -32,9 +32,8 @@ const Logo = ({ size = 40 }) => (
 );
 
 const Sidebar = ({ login, register }) => {
-  const { user, logout, presence } = useAuth();
+  const { user, logout, presence, setShowLoginModal } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
   const presenceColors = {
@@ -133,13 +132,6 @@ const Sidebar = ({ login, register }) => {
           <NavLink to="/admin" style={navStyle}><Activity size={22} /> Admin Panel</NavLink>
         )}
       </nav>
-
-      {showLoginModal && (
-        <LoginModal
-          onClose={() => setShowLoginModal(false)}
-          message="Sign in to access your personal hub and transmissions"
-        />
-      )}
 
       <div className="sidebar-footer" style={{ marginTop: 'auto' }}>
         {user ? (
@@ -686,7 +678,7 @@ export const LoginModal = ({ onClose, message = "Sign in to interact with posts"
 
 
 export default function App() {
-  const { user, login, register, loading } = useAuth();
+  const { user, login, register, loading, showLoginModal, setShowLoginModal } = useAuth();
   const [viewingTree, setViewingTree] = useState(null);
   const [showPalette, setShowPalette] = useState(false);
   const [sessionAge, setSessionAge] = useState(0);
@@ -754,32 +746,41 @@ export default function App() {
   }
 
   return (
-    <div className={`app-layout ${isStressed ? 'glitch-active' : ''}`} style={{
-      gridTemplateColumns: isMessagesPage ? '280px 1fr' : '280px 1fr 340px',
-      maxWidth: '1440px',
-      margin: '0 auto',
-      padding: '0 2rem',
-      gap: isMessagesPage ? '0' : '3.5rem',
-      filter: 'var(--app-filter, none)',
-      transition: 'filter 10s ease'
-    }}>
-      {isStressed && <div className="stress-banner">[ !! ALARM !! :: NETWORK_STRESS_DETECTED :: CORE_INTEGRITY_THREATENED ]</div>}
+    <>
+      <div className={`app-layout ${isStressed ? 'glitch-active' : ''}`} style={{
+        gridTemplateColumns: isMessagesPage ? '280px 1fr' : '280px 1fr 340px',
+        maxWidth: '1440px',
+        margin: '0 auto',
+        padding: '0 2rem',
+        gap: isMessagesPage ? '0' : '3.5rem',
+        filter: 'var(--app-filter, none)',
+        transition: 'filter 10s ease'
+      }}>
+        {isStressed && <div className="stress-banner">[ !! ALARM !! :: NETWORK_STRESS_DETECTED :: CORE_INTEGRITY_THREATENED ]</div>}
+        <Sidebar login={login} register={register} />
+        <div style={{ minWidth: 0 }}>
+          <Routes>
+            <Route path="/" element={<Feed socket={socket} onViewTree={setViewingTree} mode="home" />} />
+            <Route path="/explore" element={<Feed socket={socket} onViewTree={setViewingTree} mode="explore" />} />
+            <Route path="/post/:postId" element={<PostDetail />} />
+            <Route path="/profile/:username" element={<Profile onViewTree={setViewingTree} />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+        </div>
+        {!isMessagesPage && <RightBar />}
+      </div>
+      {/* Global Modals - Positioned outside filtered containers to ensure perfect centering */}
       {viewingTree && <TreeModal rootId={viewingTree} onClose={() => setViewingTree(null)} />}
       {showPalette && <CommandPalette onClose={() => setShowPalette(false)} />}
-      <Sidebar login={login} register={register} />
-      <div style={{ minWidth: 0 }}>
-        <Routes>
-          <Route path="/" element={<Feed socket={socket} onViewTree={setViewingTree} mode="home" />} />
-          <Route path="/explore" element={<Feed socket={socket} onViewTree={setViewingTree} mode="explore" />} />
-          <Route path="/post/:postId" element={<PostDetail />} />
-          <Route path="/profile/:username" element={<Profile onViewTree={setViewingTree} />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-      </div>
-      {!isMessagesPage && <RightBar />}
-    </div>
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          message="Authentication required to proceed with this action"
+        />
+      )}
+    </>
   );
 }

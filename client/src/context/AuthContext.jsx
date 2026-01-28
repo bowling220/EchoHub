@@ -98,8 +98,10 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading, presence }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, presence, showLoginModal, setShowLoginModal }}>
             {children}
         </AuthContext.Provider>
     );

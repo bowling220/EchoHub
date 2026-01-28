@@ -202,13 +202,12 @@ const ProfileHeatMap = ({ posts }) => {
 const Profile = ({ onViewTree }) => {
     const { username } = useParams();
     const navigate = useNavigate();
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, setShowLoginModal } = useAuth();
     const [profile, setProfile] = useState(null);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [userList, setUserList] = useState(null); // { title: string, type: 'followers' | 'following' }
     const [isEditing, setIsEditing] = useState(false);
-    const [showLoginModal, setShowLoginModal] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -430,13 +429,6 @@ const Profile = ({ onViewTree }) => {
                     </div>
                 )}
             </div>
-
-            {showLoginModal && (
-                <LoginModal
-                    onClose={() => setShowLoginModal(false)}
-                    message="Sign in to interact with users and build your network"
-                />
-            )}
         </div>
     );
 };
