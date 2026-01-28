@@ -31,7 +31,7 @@ const Logo = ({ size = 40 }) => (
   </svg>
 );
 
-const Sidebar = () => {
+const Sidebar = ({ login, register }) => {
   const { user, logout, presence } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -123,63 +123,91 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer" style={{ marginTop: 'auto' }}>
-        <div
-          className="glass"
-          style={{
-            padding: '1rem',
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            border: '1px solid rgba(255,255,255,0.05)',
-            background: 'rgba(255,255,255,0.02)',
-            transition: 'all 0.3s ease',
-            boxShadow: `0 0 10px ${presenceColors[presence]}33`
-          }}
-        >
-          <img
-            src={user?.avatar && user.avatar.trim() !== '' ? user.avatar : `https://api.dicebear.com/7.x/identicon/svg?seed=${user?.username}`}
-            width="42"
-            height="42"
+        {user ? (
+          <div
+            className="glass"
             style={{
-              borderRadius: '50%',
-              border: `2px solid ${presenceColors[presence]}`,
-              objectFit: 'cover',
-              padding: '2px',
-              transition: 'border 0.5s ease'
+              padding: '1rem',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              border: '1px solid rgba(255,255,255,0.05)',
+              background: 'rgba(255,255,255,0.02)',
+              transition: 'all 0.3s ease',
+              boxShadow: `0 0 10px ${presenceColors[presence]}33`
             }}
-            alt="me"
-            referrerPolicy="no-referrer"
-          />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 'bold', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.username}</div>
-            <div style={{ fontSize: '0.65rem', color: presenceColors[presence], display: 'flex', alignItems: 'center', gap: '4px', letterSpacing: '1px', fontWeight: 'bold' }} className="mono">
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: presenceColors[presence],
-                boxShadow: `0 0 8px ${presenceColors[presence]}`,
-                animation: 'pulse 2s infinite'
-              }} />
-              {presence.toUpperCase()}
-            </div>
-          </div>
-          <button
-            onClick={logout}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              padding: '5px',
-              borderRadius: '8px'
-            }}
-            title="Disconnect"
-            onMouseEnter={e => e.currentTarget.style.color = '#ff4d4d'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
           >
-            <LogOut size={18} />
-          </button>
-        </div>
+            <img
+              src={user?.avatar && user.avatar.trim() !== '' ? user.avatar : `https://api.dicebear.com/7.x/identicon/svg?seed=${user?.username}`}
+              width="42"
+              height="42"
+              style={{
+                borderRadius: '50%',
+                border: `2px solid ${presenceColors[presence]}`,
+                objectFit: 'cover',
+                padding: '2px',
+                transition: 'border 0.5s ease'
+              }}
+              alt="me"
+              referrerPolicy="no-referrer"
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 'bold', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.username}</div>
+              <div style={{ fontSize: '0.65rem', color: presenceColors[presence], display: 'flex', alignItems: 'center', gap: '4px', letterSpacing: '1px', fontWeight: 'bold' }} className="mono">
+                <div style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: presenceColors[presence],
+                  boxShadow: `0 0 8px ${presenceColors[presence]}`,
+                  animation: 'pulse 2s infinite'
+                }} />
+                {presence.toUpperCase()}
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '5px',
+                borderRadius: '8px'
+              }}
+              title="Disconnect"
+              onMouseEnter={e => e.currentTarget.style.color = '#ff4d4d'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
+        ) : (
+          <div className="glass" style={{
+            padding: '1.5rem',
+            borderRadius: '16px',
+            border: '1px solid var(--accent)',
+            background: 'rgba(0, 240, 255, 0.05)',
+            textAlign: 'center'
+          }}>
+            <div className="mono" style={{
+              fontSize: '0.75rem',
+              color: 'var(--accent)',
+              marginBottom: '1rem',
+              letterSpacing: '2px'
+            }}>
+              🔒 LOGIN REQUIRED
+            </div>
+            <p style={{
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '1rem',
+              lineHeight: '1.5'
+            }}>
+              Sign in to post, like, follow, and access all features
+            </p>
+            <AuthScreen login={login} register={register} inline={true} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -578,7 +606,7 @@ export default function App() {
 
   return (
     <div className={`app-layout ${isStressed ? 'glitch-active' : ''}`} style={{
-      gridTemplateColumns: isMessagesPage ? '280px 1fr' : (user ? '280px 1fr 340px' : '1fr 340px'),
+      gridTemplateColumns: isMessagesPage ? '280px 1fr' : '280px 1fr 340px',
       maxWidth: '1440px',
       margin: '0 auto',
       padding: '0 2rem',
@@ -589,19 +617,7 @@ export default function App() {
       {isStressed && <div className="stress-banner">[ !! ALARM !! :: NETWORK_STRESS_DETECTED :: CORE_INTEGRITY_THREATENED ]</div>}
       {viewingTree && <TreeModal rootId={viewingTree} onClose={() => setViewingTree(null)} />}
       {showPalette && <CommandPalette onClose={() => setShowPalette(false)} />}
-      {user && <Sidebar />}
-      {!user && (
-        <div style={{
-          position: 'fixed',
-          top: '2rem',
-          right: '2rem',
-          zIndex: 100,
-          display: 'flex',
-          gap: '1rem'
-        }}>
-          <AuthScreen login={login} register={register} inline={true} />
-        </div>
-      )}
+      <Sidebar login={login} register={register} />
       <div style={{ minWidth: 0 }}>
         <Routes>
           <Route path="/" element={<Feed socket={socket} onViewTree={setViewingTree} mode="home" />} />
