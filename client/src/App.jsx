@@ -580,7 +580,7 @@ export const LoginModal = ({ onClose, message = "Sign in to interact with posts"
         inset: 0,
         background: 'rgba(0, 0, 0, 0.85)',
         backdropFilter: 'blur(10px)',
-        zIndex: 1000,
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

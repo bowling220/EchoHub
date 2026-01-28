@@ -36,7 +36,7 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
     return (
         <div style={{
             position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-            backdropFilter: 'blur(10px)', zIndex: 1000,
+            backdropFilter: 'blur(10px)', zIndex: 9999,
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
         }} onClick={onClose}>
             <div
@@ -128,7 +128,7 @@ const UserListModal = ({ title, userId, type, onClose }) => {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000,
+            background: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999,
             backdropFilter: 'blur(8px)'
         }}>
             <div className="glass" style={{ width: '400px', maxHeight: '70vh', overflowY: 'auto', padding: '2rem', borderRadius: 'var(--radius)' }}>
