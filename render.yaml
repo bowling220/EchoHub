@@ -25,7 +25,6 @@ services:
   - type: web
     name: echohub-client
     runtime: static
-    region: oregon
     plan: free
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
